@@ -166,6 +166,12 @@
             <artifactId>jetty-jmx</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.conscrypt</groupId>
+            <artifactId>conscrypt-openjdk-uber</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+
         <!-- for testing -->
         <dependency>
             <groupId>com.facebook.airlift</groupId>

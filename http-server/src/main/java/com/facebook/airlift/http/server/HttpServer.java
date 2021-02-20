@@ -25,6 +25,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
+import org.conscrypt.OpenSSLProvider;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.io.ConnectionStatistics;
 import org.eclipse.jetty.jmx.MBeanContainer;
@@ -69,6 +70,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.ZoneId;
@@ -102,6 +104,10 @@ public class HttpServer
     private ConnectionStats httpsConnectionStats;
 
     private final Optional<ZonedDateTime> certificateExpiration;
+
+    static {
+        Security.addProvider(new OpenSSLProvider());
+    }
 
     @SuppressWarnings("deprecation")
     public HttpServer(HttpServerInfo httpServerInfo,
@@ -225,7 +231,13 @@ public class HttpServer
             HttpConfiguration httpsConfiguration = new HttpConfiguration(baseHttpConfiguration);
             httpsConfiguration.addCustomizer(new SecureRequestCustomizer());
 
-            SslContextFactory sslContextFactory = new SslContextFactory();
+            //SslContextFactory sslContextFactory = new SslContextFactory();
+
+            SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+            // Conscrypt enables TLSv1.3 by default but it's not supported in Java 8.
+            sslContextFactory.addExcludeProtocols("TLSv1.3");
+            sslContextFactory.setProvider("Conscrypt");
+
             Optional<KeyStore> pemKeyStore = tryLoadPemKeyStore(config);
             if (pemKeyStore.isPresent()) {
                 sslContextFactory.setKeyStore(pemKeyStore.get());

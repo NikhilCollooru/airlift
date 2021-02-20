@@ -240,6 +240,24 @@ public class TestHttpClientLogger
         }
 
         @Override
+        public Request tag(Object o)
+        {
+            return null;
+        }
+
+        @Override
+        public Object getTag()
+        {
+            return null;
+        }
+
+        @Override
+        public Request onResponseContentDemanded(Response.DemandedContentListener demandedContentListener)
+        {
+            return null;
+        }
+
+        @Override
         public String getScheme()
         {
             return null;
